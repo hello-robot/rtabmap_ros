@@ -323,6 +323,37 @@ void MapsManager::set2DMap(
 	}
 }
 
+void MapsManager::refreshLocalGrids(const std::set<int> & ids, const rtabmap::Memory * memory)
+{
+	if(ids.empty() || memory == 0)
+	{
+		return;
+	}
+	int refreshed = 0;
+	for(std::set<int>::const_iterator iter=ids.begin(); iter!=ids.end(); ++iter)
+	{
+		// A node not cached yet is read from memory when it is first assembled.
+		if(!uContains(localMaps_.localGrids(), *iter))
+		{
+			continue;
+		}
+		rtabmap::SensorData data = memory->getNodeData(*iter, false, false, false, true);
+		cv::Mat ground, obstacles, emptyCells;
+		data.uncompressDataConst(0, 0, 0, 0, &ground, &obstacles, &emptyCells);
+		localMaps_.add(*iter, ground, obstacles, emptyCells, data.gridCellSize(), data.gridViewPoint());
+		++refreshed;
+	}
+	if(refreshed)
+	{
+		// Assembled incrementally, the old cells of these nodes would stay: rebuild from the cache.
+		occupancyGrid_->clear();
+#ifdef RTABMAP_OCTOMAP
+		octomap_->clear();
+#endif
+		UDEBUG("Refreshed %d local grids", refreshed);
+	}
+}
+
 void MapsManager::clear()
 {
 	localMaps_.clear();

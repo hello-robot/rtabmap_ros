@@ -161,6 +161,13 @@ public:
 			const std::map<int, rtabmap::Transform> & poses);
 
 	/**
+	 * @brief Reloads the cached local grids of @p ids from @p memory, so the assembled maps
+	 *        are rebuilt on the next updateMapCaches(), e.g., after
+	 *        Mem/ReduceGraphGridOwnership changed them.
+	 */
+	void refreshLocalGrids(const std::set<int> & ids, const rtabmap::Memory * memory);
+
+	/**
 	 * @brief Brings the local grid cache and the global maps up to date with the graph.
 	 *
 	 * For every pose not already mapped, the local occupancy grid is taken from the

@@ -2573,6 +2573,9 @@ void CoreWrapper::process(
 					filteredPoses = nearestPoses;
 				}
 
+				// Local grids changed by Mem/ReduceGraphGridOwnership this update
+				mapsManager_.refreshLocalGrids(rtabmap_.getStatistics().modifiedGridIds(), rtabmap_.getMemory());
+
 				// Update maps
 				filteredPoses = mapsManager_.updateMapCaches(
 						filteredPoses,
